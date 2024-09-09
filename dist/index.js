@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const server_1 = require("@apollo/server");
 const express4_1 = require("@apollo/server/express4");
+const db_1 = require("./lib/db");
 const app = (0, express_1.default)();
 const PORT = Number(process.env.PORT) || 3001;
 function startServer() {
@@ -23,12 +24,38 @@ function startServer() {
             typeDefs: `
         type Query {
             hello: String
-            say(query: String): String
-        }`,
+            say(name: String): String
+        }
+        type Mutation{
+            createUser(firstName: String, lastName: String, email: String,password: String):Boolean
+        
+        
+        }
+        `,
             resolvers: {
                 Query: {
                     hello: () => 'Hello, World!',
                     say: (_, { name }) => `Hi ${name}! How are you`
+                },
+                Mutation: {
+                    createUser: (_1, _a) => __awaiter(this, [_1, _a], void 0, function* (_, { firstName, lastName, email, password }) {
+                        try {
+                            yield db_1.prismaClient.user.create({
+                                data: {
+                                    firstName,
+                                    lastName,
+                                    email,
+                                    password,
+                                    salt: "salt"
+                                }
+                            });
+                            return true;
+                        }
+                        catch (error) {
+                            console.error(error);
+                            return false;
+                        }
+                    })
                 }
             }
         });

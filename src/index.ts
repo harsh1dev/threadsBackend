@@ -11,10 +11,12 @@ async function startServer() {
         typeDefs: `
         type Query {
             hello: String
+            say(query: String): String
         }`,
         resolvers: {
             Query:{
                 hello: () => 'Hello, World!',
+                say: (_,{name}:{name:string}) => `Hi ${name}! How are you`
             }
         }
     });
